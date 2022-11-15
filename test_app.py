@@ -16,7 +16,7 @@
 
 import unittest
 
-from app import app
+from venv.app import app
 
 class TestApp(unittest.TestCase):
     """Unit tests for app.py."""

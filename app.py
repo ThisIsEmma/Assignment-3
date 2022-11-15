@@ -55,8 +55,13 @@ def compliments():
 @app.route('/compliments_results')
 def compliments_results():
     """Show the user some compliments."""
+    num_compliments = request.args.get('num_compliments')
+    compliments = random.sample(list_of_compliments, int(num_compliments))
     context = {
-        # TODO: Enter your context variables here.
+        'users_name': request.args.get("users_name"),
+        'wants_compliments': request.args.get('wants_compliments'),
+        'num_compliments' : num_compliments,
+        'compliments': compliments,
     }
 
     return render_template('compliments_results.html', **context)
@@ -67,7 +72,7 @@ def compliments_results():
 ################################################################################
 
 animal_to_fact = {
-    'koala': 'Koala fingerprints are so close to humans\' that they could taint crime scenes.',
+    'koala shrimp': 'Koala fingerprints are so close to humans\' that they could taint crime scenes.',
     'parrot': 'Parrots will selflessly help each other out.',
     'mantis shrimp': 'The mantis shrimp has the world\'s fastest punch.',
     'lion': 'Female lions do 90 percent of the hunting.',
@@ -79,11 +84,15 @@ def animal_facts():
     """Show a form to choose an animal and receive facts."""
 
     # TODO: Collect the form data and save as variables
-
+    animals = list(animal_to_fact.keys())
     context = {
         # TODO: Enter your context variables here for:
         # - the list of all animals (get from animal_to_fact)
         # - the chosen animal fact (may be None if the user hasn't filled out the form yet)
+        'animals' : animals,
+        'animal_chosen': request.args.get("animal"),
+        'animal_to_fact': animal_to_fact,
+    
     }
     return render_template('animal_facts.html', **context)
 
@@ -128,29 +137,34 @@ def apply_filter(file_path, filter_name):
 @app.route('/image_filter', methods=['GET', 'POST'])
 def image_filter():
     """Filter an image uploaded by the user, using the Pillow library."""
-    filter_types = filter_types_dict.keys()
+    list_of_filter = list(filter_types_dict.keys())
 
     if request.method == 'POST':
         
         # TODO: Get the user's chosen filter type (whichever one they chose in the form) and save
         # as a variable
         # HINT: remember that we're working with a POST route here so which requests function would you use?
-        filter_type = ''
+        filter_type = request.form.get('filter_type')
         
         # Get the image file submitted by the user
         image = request.files.get('users_image')
 
         # TODO: call `save_image()` on the image & the user's chosen filter type, save the returned
         # value as the new file path
+        new_file_path = save_image(image, filter_type)
 
         # TODO: Call `apply_filter()` on the file path & filter type
-
+        apply_filter(new_file_path, filter_type)
         image_url = f'./static/images/{image.filename}'
+
+        
 
         context = {
             # TODO: Add context variables here for:
             # - The full list of filter types
             # - The image URL
+            
+            'image_url': image_url,
         }
 
         return render_template('image_filter.html', **context)
@@ -158,6 +172,8 @@ def image_filter():
     else: # if it's a GET request
         context = {
             # TODO: Add context variable here for the full list of filter types
+            'list_of_filter': list_of_filter,
+            'filter_type' : request.args.get('filter_type'),
         }
         return render_template('image_filter.html', **context)
 
@@ -175,10 +191,11 @@ Register and make an API key for yourself.
 Set up dotenv, create a .env file and define a variable 
 API_KEY with a value that is the api key for your account. """
 
-API_KEY = os.getenv('API_KEY')
+API_KEY = os.getenv("API_KEY")
+ckey = "my_test_app"
 print(API_KEY)
 
-TENOR_URL = 'https://api.tenor.com/v1/search'
+TENOR_URL = 'https://tenor.googleapis.com/v2/search?q=%s&key=%s&client_key=%s&limit=%s'
 pp = PrettyPrinter(indent=4)
 
 @app.route('/gif_search', methods=['GET', 'POST'])
@@ -187,28 +204,26 @@ def gif_search():
     if request.method == 'POST':
         # TODO: Get the search query & number of GIFs requested by the user, store each as a 
         # variable
-
-        response = requests.get(
-            TENOR_URL,
-            {
-                # TODO: Add in key-value pairs for:
+        search_query = request.form.get('search_query')
+        quantity = request.form.get('quantity')
+        # TODO: Add in key-value pairs for:
                 # - 'q': the search query
                 # - 'key': the API key (defined above)
                 # - 'limit': the number of GIFs requested
-            })
+        response = requests.get(f'https://tenor.googleapis.com/v2/search?q={search_query}&key={API_KEY}&client_key={ckey}&limit={quantity}')
 
         gifs = json.loads(response.content).get('results')
-
         context = {
-            'gifs': gifs
+            'gifs': gifs,
+            'quantity': quantity,
         }
 
-         # Uncomment me to see the result JSON!
+        # Uncomment me to see the result JSON!
         # Look closely at the response! It's a list
         # list of data. The media property contains a 
         # list of media objects. Get the gif and use it's 
         # url in your template to display the gif. 
-        # pp.pprint(gifs)
+        pp.pprint(gifs)
 
         return render_template('gif_search.html', **context)
     else:
