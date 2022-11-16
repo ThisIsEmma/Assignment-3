@@ -1,3 +1,3 @@
-# Homework 3: More Forms
+# ACS1710 - Homework 3
 
-Follow the instructions [here](https://github.com/Tech-at-DU/ACS1710-Web-Architecture/blob/master/Assignments/03-More-Forms.md) to complete and submit this assignment.
+Based on the tutorial from this [repo](https://github.com/Tech-at-DU/ACS1710-Web-Architecture/blob/master/Assignments/03-More-Forms.md) to complete and submit this assignment.

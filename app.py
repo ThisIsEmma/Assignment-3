@@ -137,6 +137,7 @@ def apply_filter(file_path, filter_name):
 @app.route('/image_filter', methods=['GET', 'POST'])
 def image_filter():
     """Filter an image uploaded by the user, using the Pillow library."""
+
     list_of_filter = list(filter_types_dict.keys())
 
     if request.method == 'POST':
@@ -206,6 +207,7 @@ def gif_search():
         # variable
         search_query = request.form.get('search_query')
         quantity = request.form.get('quantity')
+
         # TODO: Add in key-value pairs for:
                 # - 'q': the search query
                 # - 'key': the API key (defined above)
